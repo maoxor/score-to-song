@@ -65,11 +65,11 @@ def _sections(groups, blocks):
     if [r[0][0] for r in g_runs] != [r[0][0] for r in b_runs]:
         raise ValueError(f"section order differs between ABC {[r[0][0] for r in g_runs]} and lyrics {[r[0][0] for r in b_runs]}")
     out = []
-    for gr, br in zip(g_runs, b_runs):
+    for gr, br in zip(g_runs, b_runs, strict=True):
         if len(br) == 1:
             out.append((gr, br[0][1]))
         elif len(br) == len(gr):
-            out += [([g], b[1]) for g, b in zip(gr, br)]
+            out += [([g], b[1]) for g, b in zip(gr, br, strict=True)]
         else:
             raise ValueError(f"cannot split {len(gr)} '{gr[0][0]}' groups among {len(br)} lyric blocks")
     return out
@@ -89,7 +89,7 @@ def import_abc(abc_text: str, request: dict | None = None, score_id: str | None 
     blocks = _lyric_blocks(request["lyrics"]) if request else None
     seed = request.get("seed") if request else None
     sid = score_id or (request["id"].rsplit("_s", 1)[0] if request and "_s" in request["id"] else "imported")
-    out = [f"# Imported from native ABC by score-to-song import-abc", f"id = {_q(sid)}"]
+    out = ["# Imported from native ABC by score-to-song import-abc", f"id = {_q(sid)}"]
     title = abc.header_field(abc_text, "T") or ""
     if title:
         out.append(f"title = {_q(title)}")
@@ -97,6 +97,7 @@ def import_abc(abc_text: str, request: dict | None = None, score_id: str | None 
     if abc_file:
         out.append(f"abc_file = {_q(abc_file)}")
     if request_file and seed is not None and f"_s{seed}" in request_file:
+        # stored as a template ('req_x_s{seed}.json') so that compose writes the same request file name
         out.append(f"request_file = {_q(request_file.replace(f'_s{seed}', '_s{seed}'))}")
     if request:
         out += [f"seeds = [{seed}]", f"cot = {_q(request.get('cot', 'full'))}", f"style = {_q(request['style'])}"]
@@ -104,7 +105,7 @@ def import_abc(abc_text: str, request: dict | None = None, score_id: str | None 
         out += ["seeds = [1]", 'style = ""   # fill in: describe voice and accompaniment (English, no artist names)']
     for run, lyrics in _sections(_groups(abc_text), blocks):
         chords, melody, ins, naturals = [], [], [], "when-needed"
-        for name, vocal, ins_bars in run:
+        for _name, vocal, ins_bars in run:
             for bar in vocal:
                 chord, events = abc.parse_bar(bar, key, bar_units)
                 if chord is None:
@@ -126,7 +127,7 @@ def import_abc(abc_text: str, request: dict | None = None, score_id: str | None 
 
 
 def import_files(abc_path: Path, request_path: Path | None, out_path: Path, score_id: str | None = None) -> dict:
-    from .compose import load_score, to_abc, lyrics_text
+    from .compose import load_score, lyrics_text, to_abc
     text = abc_path.read_text(encoding="utf-8")
     request = json.loads(request_path.read_text(encoding="utf-8")) if request_path else None
     if request and request.get("abc") and not request.get("abc_path"):

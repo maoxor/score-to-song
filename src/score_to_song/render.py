@@ -34,12 +34,16 @@ def render(requests: list[Path], out_root: Path, engines: Path, profile: str = "
         run_dir = out_root / req["id"]
         abc_file = req_path.parent / req["abc_path"] if req.get("abc_path") else None
         if run_dir.exists():
-            old = out_root / f"{req['id']}.json"
-            same = old.exists() and json.loads(old.read_text())["request"] == req and \
-                json.loads(old.read_text())["abc_sha256"] == (sha256_file(abc_file) if abc_file else None)
+            old_file = out_root / f"{req['id']}.json"
+            old = json.loads(old_file.read_text()) if old_file.exists() else None
+            same = old is not None and old["request"] == req and \
+                old["abc_sha256"] == (sha256_file(abc_file) if abc_file else None)
             if not same:
                 raise SystemExit(f"{req['id']}: {rel(run_dir)} exists but was rendered from a different request or score. "
                                  "Change the seed or the id, or move that folder away; renders are never replaced.")
+            if old["returncode"] != 0 or not old["outputs"]:
+                raise SystemExit(f"{req['id']}: the earlier render in {rel(run_dir)} failed (log: {rel(old_file.with_suffix('.log'))}). "
+                                 "It is kept for diagnosis; move that folder and its .json/.log away to render again.")
             print(f"{req['id']}: {rel(run_dir)} already exists for this exact request, skipped", flush=True)
             continue
         cmd = [str(python), str(helper), "--request", str(req_path), "--profile", profile, "--precision", precision,

@@ -45,7 +45,7 @@ def sha256_file(path: Path) -> str:
 
 
 def now_utc() -> str:
-    return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+    return dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
 
 
 def rel(path: Path) -> str:
@@ -63,8 +63,12 @@ def git_commit(directory: Path) -> str | None:
 
 
 def tool_info() -> dict:
+    """Version of score-to-song, plus its Git commit when run from a checkout of this repository."""
     here = Path(__file__).resolve().parent
-    commit = git_commit(here)
+    top = subprocess.run(["git", "-C", str(here), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    # an installed copy may sit inside some other Git work tree (e.g. a .venv in a project): not our commit
+    ours = top.returncode == 0 and Path(top.stdout.strip()).resolve() / "src" / "score_to_song" == here
+    commit = git_commit(here) if ours else None
     dirty = None
     if commit:
         status = subprocess.run(["git", "-C", str(here), "status", "--porcelain", "--", "."], capture_output=True, text=True)

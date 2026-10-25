@@ -71,7 +71,9 @@ One render at a time, each in `work/renders/<request id>/`:
 | `<id>.json` (next to the folder) | provenance: tool and mlx-Yue commits, weights and licence, request, seed, date, SHA-256 of the audio |
 | `<id>.log` | the engine's output |
 
-A folder that already exists is skipped: nothing is ever re-rendered over a result. On an M5 Max a
+A folder that already exists for the same request is skipped: nothing is ever re-rendered over a result.
+If it was made from another request or score, or if that earlier render failed, `render` stops and says
+so; move the folder (and its `.json`/`.log`) away to render again. On an M5 Max a
 51 s render took 24 s of computation (plus loading); slower Macs take longer. `--profile fast`
 (8 diffusion steps instead of 32) is quicker for auditions. The render is usually longer than the
 score: YuE2 often goes on after the last written bar. Keep what you need when mixing.
@@ -134,6 +136,7 @@ score-to-song separate work/renders/first_song_main_s20261025 work/renders/first
 ```
 
 `separate` runs BS-RoFormer (via audio-separator) and writes `<render>_voice_estimate.wav` at 48 kHz.
+An estimate that already exists is kept only if its `.wav.json` shows it was made from the same input.
 Keep the **main voice as a native render** with its own accompaniment; add only the *voice estimates*
 of the other renders, otherwise you stack two or three accompaniments. The main voice's estimate is
 still useful as a level reference.

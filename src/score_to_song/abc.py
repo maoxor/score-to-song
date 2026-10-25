@@ -116,7 +116,7 @@ def pack(events: list[Event], bar_units: int, n_bars: int | None = None) -> list
 
 def check_ties(bars: list[list[Event]]) -> None:
     flat = [e for bar in bars for e in bar]
-    for a, b in zip(flat, flat[1:]):
+    for a, b in zip(flat, flat[1:], strict=False):
         if a.tie and (b.pitch is None or b.pitch.midi != a.pitch.midi):
             raise ValueError(f"tie from {a.pitch} must reach the same pitch (next is {b.pitch})")
     if flat and flat[-1].tie:

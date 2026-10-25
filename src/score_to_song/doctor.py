@@ -63,7 +63,8 @@ def doctor(engines: Path, hash_models: bool = False) -> int:
         if not p.exists():
             check(f"separation model {name}", False, "scripts/install.sh --only separation", required=False)
         elif hash_models:
-            check(f"separation model {name}", sha256_file(p) == expected, "SHA-256 " + ("as expected" if sha256_file(p) == expected else "differs"), required=False)
+            ok = sha256_file(p) == expected
+            check(f"separation model {name}", ok, "SHA-256 " + ("as expected" if ok else "differs"), required=False)
         else:
             check(f"separation model {name}", True, "present (use --hash to verify)", required=False)
     free = _free_memory_gib()

@@ -1,5 +1,10 @@
 # score-to-song
 
+[![tests](https://github.com/maoxor/score-to-song/actions/workflows/tests.yml/badge.svg)](https://github.com/maoxor/score-to-song/actions/workflows/tests.yml)
+[![licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE)
+![Python 3.11–3.13](https://img.shields.io/badge/python-3.11%E2%80%933.13-blue.svg)
+![macOS, Apple Silicon](https://img.shields.io/badge/macOS-Apple%20Silicon-lightgrey.svg)
+
 **Write a melody as a score, have YuE2 sing it on your Mac, extend it without losing the voice, layer
 more voices, and mix — locally, at no cost, with every file traceable.**
 
@@ -11,7 +16,7 @@ mixes them with plain gains, and writes a provenance record next to every output
 
 It was built and used to produce a 1 min 56 s wordless piece for three voices (main female voice, male
 voice an octave below, high second voice) for a video game soundtrack. That piece is not part of this
-repository; an original example you can run is (`examples/first-song/`).
+repository; [`examples/first-song/`](examples/first-song/) is an original example you can run instead.
 
 ---
 
@@ -101,6 +106,7 @@ score-to-song/
 ├── docs/                     install, workflow, formats, field notes, rights
 ├── scripts/install.sh        installs the toolkit and the engines
 ├── tests/                    unit tests (pytest), no model needed
+├── CHANGELOG.md              what changed in each version
 ├── requirements.lock.txt     exact versions the toolkit was validated with
 └── vendor/                   engines (created by install.sh, ignored by Git)
 ```
@@ -126,5 +132,10 @@ score-to-song/
 
 ## Contributing
 
-Issues and pull requests are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). The code is under the
-[Apache License 2.0](LICENSE). The models it drives keep their own licences.
+Issues and pull requests are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Security problems go through
+[SECURITY.md](SECURITY.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
+## Licence
+
+The code is under the [Apache License 2.0](LICENSE). The models it drives keep their own licences: see
+[docs/rights.md](docs/rights.md).

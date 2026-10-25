@@ -7,8 +7,9 @@ Thank you for helping. Bug reports, examples, docs and code are welcome.
 ```bash
 scripts/install.sh --only toolkit      # .venv with the validated versions; enough for the tests
 source .venv/bin/activate
-pip install pytest                     # if not already there
+uv pip install -e '.[dev]'             # pytest and ruff (the .venv made by uv has no pip of its own)
 pytest                                 # unit tests: no model, no audio download, a few seconds
+ruff check src tests                   # lint, as in CI
 ```
 
 Changes to `render`, `continue` or `separate` also need the engines (`scripts/install.sh`) and a real
@@ -33,13 +34,14 @@ run: `examples/first-song/run.sh` exercises every command.
 ## Pull requests
 
 1. One topic per pull request, with a short description of what changes for a user.
-2. `pytest` passes; add a test for a bug you fix.
-3. For anything that touches sound, say what you ran (machine, command) and what you heard or measured.
+2. `pytest` and `ruff check src tests` pass; add a test for a bug you fix.
+3. Add a line to `CHANGELOG.md` under a new or `Unreleased` heading.
+4. For anything that touches sound, say what you ran (machine, command) and what you heard or measured.
 
 ## Reporting a problem
 
-Include `score-to-song doctor` output, the command, and the `.log` or `.json` next to the failed output.
-Do not attach audio you cannot share.
+Use the issue form: it asks for `score-to-song doctor` output, the command, and the `.log` or `.json` next
+to the failed output. Do not attach audio you cannot share. Security problems: see [SECURITY.md](SECURITY.md).
 
 ## Licence
 

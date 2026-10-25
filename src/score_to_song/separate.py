@@ -6,6 +6,7 @@ little of the render's own accompaniment. It is not an original stem.
 """
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
@@ -32,6 +33,18 @@ def resolve_input(path: Path) -> Path:
     return path
 
 
+def to_48k_float(src: Path, dst: Path) -> None:
+    subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(src), "-ar", "48000", "-c:a", "pcm_f32le", str(dst)], check=True)
+
+
+def same_input(out: Path, src: Path) -> bool:
+    """True if the existing estimate `out` was made from this very input (per its sidecar)."""
+    sidecar = out.with_suffix(".wav.json")
+    if not sidecar.exists():
+        return False
+    return json.loads(sidecar.read_text(encoding="utf-8"))["input"]["sha256"] == sha256_file(src)
+
+
 def separate(inputs: list[Path], out_dir: Path, engines: Path, names: list[str] | None = None, keep_instrumental: bool = False,
              suffix: str = "_voice_estimate") -> list[dict]:
     if not shutil.which("ffmpeg"):
@@ -51,7 +64,9 @@ def separate(inputs: list[Path], out_dir: Path, engines: Path, names: list[str] 
         name = names[k] if names else (Path(item).name if Path(item).is_dir() else src.stem)
         out = out_dir / f"{name}{suffix}.wav"
         if out.exists():
-            print(f"{rel(out)} exists, skipped", flush=True)
+            if not same_input(out, src):
+                raise SystemExit(f"{rel(out)} exists but was not estimated from {rel(src)}; choose another --name or --out")
+            print(f"{rel(out)} exists for this input, skipped", flush=True)
             continue
         with tempfile.TemporaryDirectory(prefix="score-to-song-sep-") as tmp:
             t = Path(tmp)
@@ -65,11 +80,11 @@ def separate(inputs: list[Path], out_dir: Path, engines: Path, names: list[str] 
             stems = {kind: sorted(t.glob(f"{name}_({kind})_*.wav")) for kind in ("Vocals", "Instrumental")}
             if not stems["Vocals"]:
                 raise SystemExit(f"no Vocals stem produced for {src}")
-            subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(stems["Vocals"][0]), "-ar", "48000", "-c:a", "pcm_f32le", str(out)], check=True)
+            to_48k_float(stems["Vocals"][0], out)
             outputs = {"voice_estimate": {"path": rel(out), "sha256": sha256_file(out)}}
             if keep_instrumental and stems["Instrumental"]:
                 inst = out_dir / f"{name}_accompaniment_estimate.wav"
-                subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(stems["Instrumental"][0]), "-ar", "48000", "-c:a", "pcm_f32le", str(inst)], check=True)
+                to_48k_float(stems["Instrumental"][0], inst)
                 outputs["accompaniment_estimate"] = {"path": rel(inst), "sha256": sha256_file(inst)}
         meta = {"nature": "separation estimate (not an original stem): contains residue of the render's accompaniment",
                 "tool": tool_info(), "input": {"path": rel(src), "sha256": sha256_file(src)},

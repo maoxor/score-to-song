@@ -1,0 +1,28 @@
+name: Bug report
+description: A command fails or does something other than what the docs say.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran, what you expected, what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: score-to-song doctor
+      description: Output of `score-to-song doctor`.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log or provenance
+      description: The `.log` or `.json` written next to the failed output (remove anything private).
+      render: text
+  - type: markdown
+    attributes:
+      value: Please do not attach audio you are not allowed to share, or anything containing keys or personal data.

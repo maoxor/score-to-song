@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     --only) ONLY=$2; shift 2 ;;
     --weights-from) WEIGHTS_FROM=$2; shift 2 ;;
-    -h|--help) sed -n 2,11p "$0"; exit 0 ;;
+    -h|--help) sed -n 2,10p "$0"; exit 0 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done

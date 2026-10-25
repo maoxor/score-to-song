@@ -201,7 +201,7 @@ def to_abc(score: Score) -> str:
         except ValueError as e:
             raise ValueError(f"section {s.name!r}: {e}") from None
     abc.check_ties([b for bars in all_bars for b in bars])
-    for s, bars in zip(score.sections, all_bars):
+    for s, bars in zip(score.sections, all_bars, strict=True):
         for g in range(0, len(s.chords), 4):
             idx = range(g, min(g + 4, len(s.chords)))
             vocal = "".join(f'"{s.chords[i]}"{abc.bar_text(bars[i], score.key, s.naturals or score.naturals)}|' for i in idx)

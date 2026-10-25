@@ -27,7 +27,8 @@ def test_bar_check():
 
 
 def test_naturals_when_needed_follow_signature_and_bar_state():
-    bar = [Event(Pitch("B", -1, 4), 4), Event(Pitch("B", 0, 4), 4), Event(Pitch("E", 0, 5), 4), Event(Pitch("F", 1, 4), 2), Event(Pitch("F", 0, 5), 2)]
+    bar = [Event(Pitch("B", -1, 4), 4), Event(Pitch("B", 0, 4), 4), Event(Pitch("E", 0, 5), 4),
+           Event(Pitch("F", 1, 4), 2), Event(Pitch("F", 0, 5), 2)]
     # Dm: B is flat by signature; after ^F, f needs '=' (accidentals apply to the letter in every octave)
     assert abc.bar_text(bar, "Dm", "when-needed") == "_B4=B4e4^F2=f2"
     assert abc.bar_text(bar, "Dm", "always") == "_B4=B4=e4^F2=f2"

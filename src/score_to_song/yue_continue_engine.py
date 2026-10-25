@@ -38,8 +38,8 @@ def main() -> None:
     from lyra.measure import ResourceMonitor
     from lyra.pipeline import SongResult, YuE2Pipeline, initial_noise
     from yue2.pipeline import SemanticResult
-    from yue2.storage import identity
     from yue2.protocol import CODEC_OFFSET, GenerationConfig, resolve_sampling
+    from yue2.storage import identity
 
     paths = json.loads(Path("models/paths.json").read_text())
     req = json.loads(a.request.read_text())
@@ -80,7 +80,7 @@ def main() -> None:
             "keep_s": a.keep_s, "kept_tokens": keep, "generated_tokens": len(tokens) - keep, "truncated": truncated,
             "request_file": str(a.request), "seed": plan.request.seed, "noise": "source noise for kept frames, initial_noise(seed) after",
             "commit_mlx_yue": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
-            "weights": paths, "memory_budget_gib": a.memory_budget_gib, "date_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+            "weights": paths, "memory_budget_gib": a.memory_budget_gib, "date_utc": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
             "output": {"path": str(flac), "sha256": hashlib.sha256(flac.read_bytes()).hexdigest(),
                        "seconds": round(len(audio) / 48000, 2)}, "cost_eur": 0}
     meta.update(json.loads(a.record))

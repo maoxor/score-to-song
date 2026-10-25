@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -109,6 +110,9 @@ def main(argv: list[str] | None = None) -> int:
     except (ValueError, FileNotFoundError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
+    except subprocess.CalledProcessError as e:
+        print(f"error: {e.cmd[0]} failed (code {e.returncode}): {' '.join(map(str, e.cmd))}", file=sys.stderr)
+        return 1
     return 0
 
 

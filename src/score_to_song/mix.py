@@ -224,7 +224,8 @@ def mix(recipe_path: Path, out: Path | None = None, overrides: dict[str, str] | 
             raise SystemExit(f"peak {peak:.3f} above {peak_max} ({20 * np.log10(peak_max):.1f} dBFS); lower the layers or set on_peak = \"trim\"")
     fmt = {"float": "FLOAT", "pcm24": "PCM_24"}[d.get("format", "float")]
     sha = write_wav(out, total, sr, fmt)
-    report.update({"length_s": round(n / sr, 4), "peak_before_trim": round(peak, 4), "peak": round(peak * trim, 4), "trim_db": round(20 * np.log10(trim), 2), "effects": "none",
+    report.update({"length_s": round(n / sr, 4), "peak_before_trim": round(peak, 4), "peak": round(peak * trim, 4),
+                   "trim_db": round(20 * np.log10(trim), 2), "effects": "none",
                    "date_utc": now_utc(), "output": {"path": rel(out), "sha256": sha, "format": f"WAV {sr} Hz {d.get('format', 'float')}"}})
     if "loop_test" in d:
         lt = d["loop_test"]

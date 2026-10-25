@@ -82,3 +82,12 @@ def test_import_round_trip(tmp_path):
     out = import_files(tmp_path / "a/demo.abc", tmp_path / "a/req_demo_s7.json", tmp_path / "imported.toml")
     assert out["round_trip"] == "identical ABC and lyrics"
     assert to_abc(load_score(tmp_path / "imported.toml")) == EXPECTED_ABC
+
+
+def test_request_file_template_and_same_json_is_left_alone(tmp_path):
+    (tmp_path / "demo.toml").write_text(SCORE.replace('seeds = [7, 8]', 'seeds = [7]\nrequest_file = "demo_{seed}.json"'))
+    compose(tmp_path / "demo.toml", tmp_path / "out")
+    p = tmp_path / "out/demo_7.json"
+    p.write_text(p.read_text().rstrip("\n"))          # same request, other formatting
+    report = compose(tmp_path / "demo.toml", tmp_path / "out")
+    assert report["requests"][0]["state"] == "unchanged" and not p.read_text().endswith("\n")

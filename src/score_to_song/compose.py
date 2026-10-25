@@ -44,6 +44,7 @@ class Score:
     title: str = ""
     abc_file: str | None = None
     accompaniment: dict = field(default_factory=dict)
+    request_file: str | None = None   # file name template of the requests, with {seed}
 
     @property
     def bar_units(self) -> int:
@@ -67,7 +68,7 @@ def load_score(path: Path) -> Score:
     if "extend" in data:
         return _extend(path, data)
     unknown = set(data) - {"id", "title", "tempo", "meter", "key", "unit", "naturals", "style", "seeds", "cot",
-                           "abc_file", "accompaniment", "sections"}
+                           "abc_file", "request_file", "accompaniment", "sections"}
     if unknown:
         raise ValueError(f"{path}: unknown fields {sorted(unknown)}")
     for required in ("id", "tempo", "key", "style", "sections"):
@@ -77,7 +78,7 @@ def load_score(path: Path) -> Score:
     score = Score(id=data["id"], title=data.get("title", ""), tempo=int(data["tempo"]), meter=data.get("meter", "4/4"),
                   key=data["key"], unit=int(data.get("unit", 16)), naturals=data.get("naturals", "always"),
                   style=data["style"].strip(), seeds=[int(s) for s in data.get("seeds", [1])], cot=data.get("cot", "full"),
-                  sections=[], abc_file=data.get("abc_file"), accompaniment=acc)
+                  sections=[], abc_file=data.get("abc_file"), accompaniment=acc, request_file=data.get("request_file"))
     score.sections = _parse_sections(data.get("sections", []), score, acc)
     return score
 
@@ -155,7 +156,7 @@ def _derive(path: Path, data: dict) -> Score:
     return Score(id=data["id"], title=data.get("title", src.title), tempo=src.tempo, meter=src.meter, key=src.key,
                  unit=src.unit, naturals=data.get("naturals", src.naturals), style=data.get("style", src.style).strip(),
                  seeds=[int(s) for s in data.get("seeds", src.seeds)], cot=data.get("cot", src.cot), sections=sections,
-                 abc_file=data.get("abc_file"), accompaniment=src.accompaniment)
+                 abc_file=data.get("abc_file"), accompaniment=src.accompaniment, request_file=data.get("request_file"))
 
 
 def _extend(path: Path, data: dict) -> Score:
@@ -167,13 +168,13 @@ def _extend(path: Path, data: dict) -> Score:
     if set(e) - {"from"}:
         raise ValueError(f"{path}: [extend] takes only 'from' (top-level fields go before [extend])")
     src = load_score(path.parent / e["from"])
-    unknown = set(data) - {"id", "title", "style", "seeds", "cot", "naturals", "abc_file", "sections", "extend"}
+    unknown = set(data) - {"id", "title", "style", "seeds", "cot", "naturals", "abc_file", "request_file", "sections", "extend"}
     if unknown:
         raise ValueError(f"{path}: unknown fields {sorted(unknown)} (an extension keeps the source's tempo, meter, key and unit)")
     score = Score(id=data["id"], title=data.get("title", src.title), tempo=src.tempo, meter=src.meter, key=src.key, unit=src.unit,
                   naturals=data.get("naturals", src.naturals), style=data.get("style", src.style).strip(),
                   seeds=[int(x) for x in data.get("seeds", src.seeds)], cot=data.get("cot", src.cot), sections=[],
-                  abc_file=data.get("abc_file"), accompaniment=src.accompaniment)
+                  abc_file=data.get("abc_file"), accompaniment=src.accompaniment, request_file=data.get("request_file"))
     score.sections = src.sections + _parse_sections(data.get("sections", []), score, src.accompaniment)
     return score
 
@@ -239,7 +240,10 @@ def compose(score_path: Path, out_dir: Path, force: bool = False) -> dict:
               "bars": sum(len(s.chords) for s in score.sections), "nominal_seconds": round(nominal_seconds(score), 2),
               "requests": []}
     for req in requests(score, abc_name):
-        p = out_dir / f"req_{req['id']}.json"
-        state = _write(p, json.dumps(req, ensure_ascii=False, indent=1) + "\n", force)
+        p = out_dir / (score.request_file.format(seed=req["seed"]) if score.request_file else f"req_{req['id']}.json")
+        if p.exists() and json.loads(p.read_text(encoding="utf-8")) == req:
+            state = "unchanged"            # same request, whatever its formatting: the file is left as it is
+        else:
+            state = _write(p, json.dumps(req, ensure_ascii=False, indent=1) + "\n", force)
         report["requests"].append({"path": str(p), "state": state})
     return report

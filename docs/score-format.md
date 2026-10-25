@@ -17,6 +17,7 @@ A score file is TOML. `score-to-song compose` turns it into YuE2's native ABC an
 | `naturals` | no | `always` (default) writes `=` on every natural note; `when-needed` only where the key or an earlier accidental in the bar would alter it. Sharps and flats are always written |
 | `title` | no | `T:` field (empty by default) |
 | `abc_file` | no | file name of the ABC (default `<id>.abc`) |
+| `request_file` | no | file name of the requests, with `{seed}` (default `req_<id>_s{seed}.json`) |
 | `[accompaniment]` | no | `pattern` (`ostinato`, `drone`, `rest`), `rhythm` (ostinato durations, default `[6, 6, 4]` in 4/4), `bars` (chord → explicit Ins bar) |
 
 In TOML, keys written after a `[table]` header belong to that table: put the top-level fields first.

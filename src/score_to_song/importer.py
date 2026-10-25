@@ -79,7 +79,8 @@ def _q(s: str) -> str:
     return json.dumps(s, ensure_ascii=False)
 
 
-def import_abc(abc_text: str, request: dict | None = None, score_id: str | None = None, abc_file: str | None = None) -> str:
+def import_abc(abc_text: str, request: dict | None = None, score_id: str | None = None, abc_file: str | None = None,
+               request_file: str | None = None) -> str:
     key, meter = abc.header_field(abc_text, "K"), abc.header_field(abc_text, "M")
     unit = int(abc.header_field(abc_text, "L").split("/")[1])
     tempo = int(abc.header_field(abc_text, "Q").split("=")[1])
@@ -95,6 +96,8 @@ def import_abc(abc_text: str, request: dict | None = None, score_id: str | None 
     out += [f"tempo = {tempo}", f"meter = {_q(meter)}", f"key = {_q(key)}", f"unit = {unit}"]
     if abc_file:
         out.append(f"abc_file = {_q(abc_file)}")
+    if request_file and seed is not None and f"_s{seed}" in request_file:
+        out.append(f"request_file = {_q(request_file.replace(f'_s{seed}', '_s{seed}'))}")
     if request:
         out += [f"seeds = [{seed}]", f"cot = {_q(request.get('cot', 'full'))}", f"style = {_q(request['style'])}"]
     else:
@@ -128,7 +131,7 @@ def import_files(abc_path: Path, request_path: Path | None, out_path: Path, scor
     request = json.loads(request_path.read_text(encoding="utf-8")) if request_path else None
     if request and request.get("abc") and not request.get("abc_path"):
         raise ValueError("request carries inline ABC; pass that ABC as a file")
-    toml_text = import_abc(text, request, score_id, abc_path.name)
+    toml_text = import_abc(text, request, score_id, abc_path.name, request_path.name if request_path else None)
     if out_path.exists():
         raise SystemExit(f"{out_path} exists; choose a new file name")
     out_path.parent.mkdir(parents=True, exist_ok=True)

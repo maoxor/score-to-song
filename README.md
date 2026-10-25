@@ -44,7 +44,7 @@ generated material is kept as it is, so what you judge is the composition and th
 ## Install
 
 ```bash
-git clone <this repository> score-to-song && cd score-to-song
+git clone https://github.com/maoxor/score-to-song && cd score-to-song
 scripts/install.sh            # toolkit, mlx-Yue (pinned commit), YuE2 weights (download + local conversion), separator
 source .venv/bin/activate
 score-to-song doctor          # read-only check of everything above

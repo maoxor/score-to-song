@@ -19,6 +19,11 @@ classifiers = [
 ]
 dependencies = ["numpy>=1.26", "soundfile>=0.12", "pyloudnorm>=0.1.1"]
 
+[project.urls]
+Homepage = "https://github.com/maoxor/score-to-song"
+Documentation = "https://github.com/maoxor/score-to-song/tree/main/docs"
+Issues = "https://github.com/maoxor/score-to-song/issues"
+
 [project.optional-dependencies]
 separation = ["audio-separator>=0.30"]
 test = ["pytest>=8"]

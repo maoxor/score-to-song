@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "score-to-song"
+dynamic = ["version"]
+description = "Write a melody as a score, have YuE2 sing it locally on Apple Silicon, extend it by continuation, layer voices and mix with linear gains, with full provenance."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.11"
+authors = [{ name = "score-to-song authors" }]
+keywords = ["music generation", "singing", "YuE", "MLX", "Apple Silicon", "ABC notation", "vocals"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: MacOS",
+  "Topic :: Multimedia :: Sound/Audio",
+]
+dependencies = ["numpy>=1.26", "soundfile>=0.12", "pyloudnorm>=0.1.1"]
+
+[project.optional-dependencies]
+separation = ["audio-separator>=0.30"]
+test = ["pytest>=8"]
+
+[project.scripts]
+score-to-song = "score_to_song.cli:main"
+
+[tool.hatch.version]
+path = "src/score_to_song/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/score_to_song"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

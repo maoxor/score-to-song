@@ -1,0 +1,21 @@
+# Mix of the example: the main render, spliced into its continuation, with the male voice estimate under the
+# chorus. Paths are relative to this file. Linear gains and short fades only.
+output = "work/first_song_mix.wav"
+on_peak = "trim"               # renders can peak above -1 dBFS on their own: one linear gain on the whole mix
+
+[[main]]
+file = "work/renders/first_song_main_s20261025/generate/audio.flac"
+[[main]]                       # the continuation sings the same thing up to its keep point (30.5 s): splice just before
+file = "work/renders/first_song_long_s20261025/generate/audio.flac"
+at = 30.0
+crossfade = 0.2
+
+[[layers]]
+label = "low voice, chorus"
+file = "work/voices/first_song_low_s20261025_voice_estimate.wav"
+delay = 0.0                    # adjust by ear if the two renders are not in time (e.g. -0.1 or 0.2)
+windows = [[18.5, 31.4]]       # chorus: bars 7-10 start at 6 x 3.158 s = 18.95 s
+level = { match = "work/voices/first_song_main_s20261025_voice_estimate.wav", offset_lu = -4 }
+
+[loop_test]                    # the end of the mix crossfaded into its beginning, to judge the loop point
+crossfade = 0.5

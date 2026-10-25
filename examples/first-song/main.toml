@@ -1,0 +1,29 @@
+# Main voice of the example: a short wordless song in A minor (10 bars, about 32 s at 76 BPM).
+# Notes are PITCH:UNITS with one unit = a sixteenth note (16 units per 4/4 bar); "r" is a rest,
+# a trailing "~" ties a note to the next one, "|" is an optional bar check.
+id = "first_song_main"
+tempo = 76
+meter = "4/4"
+key = "Am"
+seeds = [20261025]
+style = """Soft clear female solo voice singing a slow wordless melody on open vowels, straight tone, smooth legato, \
+calm and warm, cinematic ambient score, solo cello, soft low string pulse, warm pads, no drums, no echo, 76 BPM, A minor"""
+
+[accompaniment]
+pattern = "ostinato"   # bass, fifth, root in 3+3+2 eighths; "drone" holds the bass; "rest" leaves the Ins voice silent
+
+[[sections]]
+name = "intro"
+chords = ["Am", "F"]
+
+[[sections]]
+name = "verse"
+chords = ["Am", "F", "C", "G"]
+melody = "A4:8 E5:8 | F5:12 E5:4 | G5:8 F5:4 E5:4 | D5:12 r:4"
+lyrics = ["Ah ah", "Ah oh ah"]
+
+[[sections]]
+name = "chorus"
+chords = ["F", "G", "Am", "Am"]
+melody = "C5:4 E5:4 A5:8 | G5:6 F5:2 D5:8 | C5:8 B4:4 A4:4~ | A4:12 r:4"
+lyrics = ["Ah ah eh ah"]

@@ -1,0 +1,12 @@
+# Second voice: a male voice doubling the main line one octave lower on its held notes, from the chorus on.
+# It is rendered on its own (YuE2 sings one solo voice per render), then its voice is separated and laid
+# under the main render in the mix.
+id = "first_song_low"
+style = """Warm natural male solo voice singing long legato vowel phrases, soft and steady, \
+cinematic ambient score, solo cello, soft low string pulse, warm pads, no drums, no echo, 76 BPM, A minor"""
+
+[derive]
+from = "main.toml"          # same tempo, key, chords, accompaniment and seed
+transpose = -12
+hold_shorter_than = 6       # notes shorter than 6 units are absorbed into the note before: the low voice holds
+rest_sections = [2]         # silent in section 2 (the verse); sings the chorus

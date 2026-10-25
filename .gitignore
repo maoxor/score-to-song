@@ -1,0 +1,13 @@
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.DS_Store
+.venv/
+# engines installed by scripts/install.sh (mlx-Yue, weights, separation model)
+vendor/
+# everything an example produces (renders, voices, mixes, listening pages)
+examples/*/work/
+# audio never goes into Git
+*.wav
+*.flac
+*.npy
